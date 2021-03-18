@@ -1,0 +1,85 @@
+---
+title: "ResearchGate: Vertical Dots"
+author: "M MICHEL"
+date: "3/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+There may be some confusion as stacked bar would be aggregated as per the categorical variable to be used for the specific bar. If someone wants to plot dots following some categorization (let's say, maybe 2), there are easy ways to do that with R. 
+
+**ggplot2** dos that nicely, don't let yourself be afraid by the name, it stands for Grammar of graphics, which is an harmonization on how to consider plotting choices (and so, how to code these plotting choices). Here I use one extensive R package **tidyverse** that contains tons of things including **ggplot2** and something I use to build a table below.
+
+
+# 1. Build an example table
+
+
+```{r table, warning=F}
+
+  library(tidyverse)
+
+  data <-tibble(c(runif(33)*100,runif(33)*60,runif(34)*30), 
+                c(rep('a',40),rep('b',35),rep('c',25)),
+                c(rep('#',10),rep('$',50),rep('@',40))) 
+
+  names(data) <- c("value","cat1","cat2")
+  
+  data[seq(1,100,by=5),]
+
+```
+
+## **If you already have your data, it starts here only!**
+
+
+# 2. A scatter plot per category
+
+
+```{r plot}
+
+  a <- ggplot(data, aes(x=cat1,y=value)) # load your data and analysis dimensions
+  a + geom_point(aes(color=cat2), size=5, alpha=.5) # tell what to plot
+
+```
+
+This is not stacked!!! and you see the individual points nicely in line.
+
+
+
+
+# 3. Stacked bars now
+
+```{r stacked}
+
+  a <- ggplot(data, aes(x=cat1,y=value,fill=cat2))
+  a + geom_bar(stat="identity") # here the stacked bars from geom_bar are already an aggregation, it won't plot individual values!!!
+
+```
+
+
+So now, we're stacked.
+
+But would we rather show it as points?
+
+```{r stacked2}
+
+  a <- ggplot(data)
+  
+  a + 
+  stat_summary(aes(x = cat1, y = value), 
+               fun = function(x) sum(x), 
+               geom = "point",
+               size = 5) # this count "by hand" the aggregated sum by categories, still no  individual values!!!
+
+```
+
+
+So these examples can hopefully help you clarify what you want to plot and how to do that in R at least.
+
+Hope this helps!
+
